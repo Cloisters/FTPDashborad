@@ -1,24 +1,30 @@
 import ftplib
+from termcolor import colored
 
-# connect to the FTP server on port 21
+print (colored('''
+
+███████╗████████╗██████╗░██████╗░░█████╗░░██████╗██╗░░██╗
+██╔════╝╚══██╔══╝██╔══██╗██╔══██╗██╔══██╗██╔════╝██║░░██║
+█████╗░░░░░██║░░░██████╔╝██║░░██║███████║╚█████╗░███████║
+██╔══╝░░░░░██║░░░██╔═══╝░██║░░██║██╔══██║░╚═══██╗██╔══██║
+██║░░░░░░░░██║░░░██║░░░░░██████╔╝██║░░██║██████╔╝██║░░██║
+╚═╝░░░░░░░░╚═╝░░░╚═╝░░░░░╚═════╝░╚═╝░░╚═╝╚═════╝░╚═╝░░╚═╝
+                           Developed By Entity.Network 
+                           
+
+''', "red" ))
+
 ftp = ftplib.FTP()
-ip = input("your ftp server ip : ")  
-username = input("your ftp username: ")
-password = input("your ftp password: ")
-port = int(input("your port : "))
+ip = input(colored("[!] Your Ftp Server Ip : ", 'green'))
+username = input(colored("[!] Your Ftp Username: ", 'green'))
+password = input(colored("[!] Your Ftp Password: ", 'green'))
+port = int(input(colored("[!] Enter Ftp Port: ", "green")))
 ftp.connect(ip, port=port)
 ftp.login(username, password)
-
-# set a file for download
-
-
-# list files in the current directory
 ftp.cwd('/')
 print(ftp.dir())
 
-filename = input("input file name: ")
+filename = input(colored("[+] input file name: ", 'blue'))
 with open(filename, 'wb') as f:
       ftp.retrbinary('RETR ' + filename, f.write)
-
-# close the FTP connection
 ftp.quit()
