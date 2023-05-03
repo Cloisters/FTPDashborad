@@ -6,7 +6,7 @@ This is a simple Python script to perform *brute-force* attacks on FTP servers. 
 
 #Prerequisites
 
-Python 3.x
+`Python 3.x`
 `ftplib library`
 `colorama library`
 
