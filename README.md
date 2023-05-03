@@ -22,6 +22,6 @@ pip install -r requirements.txt
 
 #Run 
 
-`Python ftpbomber.py`
+`Python Ftpbomber.py`
 
-`python FTPenumerate.py`
+`python FtpEnumrate.py`
