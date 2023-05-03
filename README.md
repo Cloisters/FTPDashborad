@@ -1,4 +1,4 @@
-#FTP Brute Force
+##FTP Brute Force
 This is a simple Python script to perform *brute-force* attacks on FTP servers. The script uses a list of usernames and passwords to try to login into an FTP server. If successful, the script displays the login credentials.
 #Prerequisites
 Python 3.x
