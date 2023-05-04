@@ -1,2 +1,2 @@
-ftpdlib
+Pyftpdlib
 colorama
